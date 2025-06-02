@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Grid Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 12px;
+            color: var(--figma-color-text);
+            background: var(--figma-color-bg);
+        }
+        
+        .header {
+            margin-bottom: 16px;
+        }
+        
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--figma-color-text);
+        }
+        
+        .selection-info {
+            padding: 8px 12px;
+            background: var(--figma-color-bg-secondary);
+            border-radius: 4px;
+            font-size: 11px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--figma-color-border-brand);
+        }
+        
+        .selection-info.invalid {
+            border-left-color: var(--figma-color-bg-danger);
+            background: var(--figma-color-bg-danger-secondary);
+        }
+        
+        .control-group {
+            margin-bottom: 16px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 11px;
+            color: var(--figma-color-text);
+        }
+        
+        .control-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--figma-color-border);
+            border-radius: 4px;
+            font-size: 12px;
+            background: var(--figma-color-bg);
+            color: var(--figma-color-text);
+        }
+        
+        .control-group input:focus {
+            border-color: var(--figma-color-border-brand);
+            outline: none;
+        }
+        
+        .color-weight-group {
+            display: grid;
+            grid-template-columns: 1fr 70px;
+            gap: 8px;
+            align-items: end;
+        }
+        
+        .color-input {
+            width: 100%;
+            height: 32px;
+            padding: 0;
+            border: 1px solid var(--figma-color-border);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .section-header {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--figma-color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 20px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--figma-color-border);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--figma-color-bg-brand);
+            color: var(--figma-color-text-onbrand);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: var(--figma-color-bg-brand-hover);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--figma-color-bg-disabled);
+            color: var(--figma-color-text-disabled);
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: var(--figma-color-bg-secondary);
+            color: var(--figma-color-text);
+            border: 1px solid var(--figma-color-border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--figma-color-bg-hover);
+        }
+        
+        .stats {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--figma-color-bg-success-secondary);
+            border-radius: 4px;
+            font-size: 11px;
+            line-height: 1.4;
+            display: none;
+        }
+        
+        .stats.show {
+            display: block;
+        }
+        
+        .error {
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--figma-color-bg-danger-secondary);
+            color: var(--figma-color-text-danger);
+            border-radius: 4px;
+            font-size: 11px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Grid Generator</h1>
+        <div class="selection-info" id="selectionInfo">
+            Select a frame to generate a grid
+        </div>
+    </div>
+    
+    <form id="gridForm">
+        <div class="control-group">
+            <label for="gridInterval">Grid Line Interval (px)</label>
+            <input type="number" id="gridInterval" value="100" min="1" max="2000" step="1">
+        </div>
+        
+        <div class="control-group">
+            <label for="secondaryLines">Secondary Lines Between Primary</label>
+            <input type="number" id="secondaryLines" value="4" min="0" max="20" step="1">
+        </div>
+        
+        <div class="section-header">Primary Lines</div>
+        <div class="control-group">
+            <div class="color-weight-group">
+                <div>
+                    <label for="primaryColor">Color</label>
+                    <input type="color" id="primaryColor" value="#000000" class="color-input">
+                </div>
+                <div>
+                    <label for="primaryWeight">Weight (px)</label>
+                    <input type="number" id="primaryWeight" value="2" min="0.1" max="10" step="0.1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-header">Secondary Lines</div>
+        <div class="control-group">
+            <div class="color-weight-group">
+                <div>
+                    <label for="secondaryColor">Color</label>
+                    <input type="color" id="secondaryColor" value="#cccccc" class="color-input">
+                </div>
+                <div>
+                    <label for="secondaryWeight">Weight (px)</label>
+                    <input type="number" id="secondaryWeight" value="1" min="0.1" max="10" step="0.1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="generateBtn" disabled>Generate Grid</button>
+        </div>
+        
+        <div class="stats" id="stats"></div>
+        <div class="error" id="error"></div>
+    </form>
+
+    <script>
+        let hasValidSelection = false;
+        let selectedFrame = null;
+
+        // Listen for messages from the main plugin code
+        window.onmessage = (event) => {
+            const msg = event.data.pluginMessage;
+            if (!msg) return;
+
+            switch (msg.type) {
+                case 'selection-update':
+                    updateSelectionUI(msg);
+                    break;
+                case 'grid-generated':
+                    showSuccess(msg.stats);
+                    break;
+                case 'error':
+                    showError(msg.message);
+                    break;
+            }
+        };
+
+        function updateSelectionUI(msg) {
+            hasValidSelection = msg.hasValidSelection;
+            selectedFrame = msg.selectedFrame;
+            
+            const selectionInfo = document.getElementById('selectionInfo');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            selectionInfo.textContent = msg.message;
+            selectionInfo.className = hasValidSelection ? 'selection-info' : 'selection-info invalid';
+            generateBtn.disabled = !hasValidSelection;
+            
+            // Hide previous results
+            hideMessages();
+        }
+
+        function generateGrid() {
+            if (!hasValidSelection) return;
+            
+            const params = {
+                gridInterval: parseInt(document.getElementById('gridInterval').value),
+                secondaryLines: parseInt(document.getElementById('secondaryLines').value),
+                primaryColor: document.getElementById('primaryColor').value,
+                primaryWeight: parseFloat(document.getElementById('primaryWeight').value),
+                secondaryColor: document.getElementById('secondaryColor').value,
+                secondaryWeight: parseFloat(document.getElementById('secondaryWeight').value)
+            };
+            
+            // Validate parameters
+            if (params.gridInterval <= 0) {
+                showError('Grid interval must be greater than 0');
+                return;
+            }
+            
+            if (params.primaryWeight <= 0 || params.secondaryWeight <= 0) {
+                showError('Line weights must be greater than 0');
+                return;
+            }
+            
+            hideMessages();
+            
+            // Send parameters to main plugin code
+            parent.postMessage({ 
+                pluginMessage: { 
+                    type: 'generate-grid', 
+                    params: params 
+                } 
+            }, '*');
+        }
+
+        function cancel() {
+            parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+        }
+
+        function showSuccess(stats) {
+            const statsEl = document.getElementById('stats');
+            statsEl.innerHTML = `
+                <strong>Grid Generated Successfully!</strong><br>
+                Frame: ${selectedFrame.name}<br>
+                Primary lines: ${stats.primaryLinesV} vertical, ${stats.primaryLinesH} horizontal<br>
+                Secondary lines: ${stats.secondaryLinesV} vertical, ${stats.secondaryLinesH} horizontal<br>
+                Total: ${stats.totalLines} lines created
+            `;
+            statsEl.classList.add('show');
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideMessages() {
+            document.getElementById('stats').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+        }
+
+        // Form submission
+        document.getElementById('gridForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            generateGrid();
+        });
+
+        // Auto-hide messages when inputs change
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', hideMessages);
+        });
+    </script>
+</body>
+</html>

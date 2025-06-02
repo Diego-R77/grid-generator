@@ -1,0 +1,19 @@
+{
+  "name": "Grid Generator",
+  "id": "1511450412617078094",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "capabilities": [],
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "menu": [
+    {
+      "name": "Grid Generator",
+      "command": "generate-grid"
+    }
+  ]
+}
